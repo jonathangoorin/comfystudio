@@ -5,7 +5,12 @@
 
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { BUILTIN_WORKFLOWS, AVAILABLE_WORKFLOWS, BUILTIN_WORKFLOW_PATHS } from '../config/workflowRegistry'
+import {
+  BUILTIN_WORKFLOWS,
+  AVAILABLE_WORKFLOWS,
+  BUILTIN_WORKFLOW_PATHS,
+  getBundledWorkflowPath,
+} from '../config/workflowRegistry'
 import { isElectron } from '../services/fileSystem'
 
 const STORAGE_KEY = 'comfystudio-workflows'
@@ -56,8 +61,7 @@ const useWorkflowsStore = create(
           if (!dir) throw new Error('Could not get workflows directory')
           const { createDirectory, writeFile, pathJoin } = window.electronAPI
           // Fetch workflow JSON from public
-          const base = import.meta.env.BASE_URL || '/'
-          const url = `${base}workflows/${w.file}`.replace(/\/+/g, '/')
+          const url = getBundledWorkflowPath(w.file)
           const resp = await fetch(url)
           if (!resp.ok) throw new Error('Failed to fetch workflow')
           const json = await resp.json()
@@ -72,7 +76,7 @@ const useWorkflowsStore = create(
           }))
         } else {
           // Web: store in localStorage
-          const url = `/workflows/${w.file}`
+          const url = getBundledWorkflowPath(w.file)
           const resp = await fetch(url)
           if (!resp.ok) throw new Error('Failed to fetch workflow')
           const json = await resp.json()

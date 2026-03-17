@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import comfyui, { modifyMaskWorkflow } from '../services/comfyui';
+import { getBundledWorkflowPath } from '../config/workflowRegistry';
 
 // Store the base workflow in memory after first load
 let cachedWorkflows = {};
@@ -454,7 +455,7 @@ export function useComfyUI() {
       
       // Step 3: Load the mask workflow if not cached
       if (!cachedWorkflows['mask-generation']) {
-        const workflowResponse = await fetch('/workflows/mask_generation_text_prompt.json');
+        const workflowResponse = await fetch(getBundledWorkflowPath('mask_generation_text_prompt.json'));
         if (!workflowResponse.ok) {
           throw new Error('Failed to load mask workflow');
         }

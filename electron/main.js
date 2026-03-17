@@ -23,6 +23,7 @@ const DEFAULT_LOCAL_COMFY_PORT = 8188
 let mainWindow = null
 let splashWindow = null
 let exportWorkerWindow = null
+let restoreFullscreenAfterMinimize = false
 const settingsPath = path.join(app.getPath('userData'), 'settings.json')
 
 function setSplashStatus(text) {
@@ -105,9 +106,22 @@ async function runStartupChecks() {
 // ============================================
 
 ipcMain.handle('window:minimize', () => {
-  if (mainWindow) {
+  if (!mainWindow || mainWindow.isDestroyed()) return false
+
+  restoreFullscreenAfterMinimize = mainWindow.isFullScreen()
+  if (!restoreFullscreenAfterMinimize) {
+    mainWindow.minimize()
+    return true
+  }
+
+  const minimizeAfterLeavingFullscreen = () => {
+    if (!mainWindow || mainWindow.isDestroyed() || mainWindow.isMinimized()) return
     mainWindow.minimize()
   }
+
+  mainWindow.once('leave-full-screen', minimizeAfterLeavingFullscreen)
+  mainWindow.setFullScreen(false)
+  setTimeout(minimizeAfterLeavingFullscreen, 150)
   return true
 })
 
@@ -236,6 +250,15 @@ async function createWindow() {
   
   mainWindow.on('closed', () => {
     mainWindow = null
+  })
+
+  mainWindow.on('restore', () => {
+    if (!restoreFullscreenAfterMinimize) return
+    restoreFullscreenAfterMinimize = false
+    setTimeout(() => {
+      if (!mainWindow || mainWindow.isDestroyed()) return
+      mainWindow.setFullScreen(true)
+    }, 0)
   })
   
   // Register keyboard shortcut for DevTools (F12 or Ctrl+Shift+I)

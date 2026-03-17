@@ -9,6 +9,18 @@ export const WORKFLOW_CATEGORIES = {
   audio: 'audio',
 }
 
+const WORKFLOW_BASE_URL = (() => {
+  const rawBase = typeof import.meta !== 'undefined' && import.meta.env?.BASE_URL
+    ? String(import.meta.env.BASE_URL)
+    : '/'
+  return rawBase.endsWith('/') ? rawBase : `${rawBase}/`
+})()
+
+export function getBundledWorkflowPath(filename) {
+  const safeFilename = String(filename || '').replace(/^\/+/, '')
+  return `${WORKFLOW_BASE_URL}workflows/${safeFilename}`
+}
+
 // Built-in workflows shipped with ComfyStudio - always installed, cannot be deleted
 export const BUILTIN_WORKFLOWS = [
   { id: 'wan22-i2v', label: 'Image to Video (WAN 2.2)', category: 'video', needsImage: true, description: 'Animate an image into video', file: 'video_wan2_2_14B_i2v.json' },
@@ -27,20 +39,20 @@ export const BUILTIN_WORKFLOWS = [
 
 // Map workflow id -> public path (for loading JSON)
 export const BUILTIN_WORKFLOW_PATHS = {
-  'wan22-i2v': '/workflows/video_wan2_2_14B_i2v.json',
-  'kling-o3-i2v': '/workflows/api_kling_o3_i2v.json',
-  'grok-video-i2v': '/workflows/api_grok_video.json',
-  'vidu-q2-i2v': '/workflows/api_vidu_q2_i2v.json',
-  'multi-angles': '/workflows/1_click_multiple_angles.json',
-  'multi-angles-scene': '/workflows/1_click_multiple_scene_angles-v1.0.json',
-  'image-edit': '/workflows/image_qwen_image_edit_2509.json',
-  'image-edit-model-product': '/workflows/image_qwen_image_edit_2509_Model_and_Product.json',
-  'z-image-turbo': '/workflows/image_z_image_turbo.json',
-  'nano-banana-2': '/workflows/api_google_nano_banana2_image_edit.json',
-  'grok-text-to-image': '/workflows/api_grok_text_to_image.json',
-  'seedream-5-lite-image-edit': '/workflows/api_bytedance_seedream_5_0_lite_image_edit.json',
-  'nano-banana-pro': '/workflows/api_google_nano_banana2_image_edit.json', // legacy id alias
-  'music-gen': '/workflows/music_generation.json',
+  'wan22-i2v': getBundledWorkflowPath('video_wan2_2_14B_i2v.json'),
+  'kling-o3-i2v': getBundledWorkflowPath('api_kling_o3_i2v.json'),
+  'grok-video-i2v': getBundledWorkflowPath('api_grok_video.json'),
+  'vidu-q2-i2v': getBundledWorkflowPath('api_vidu_q2_i2v.json'),
+  'multi-angles': getBundledWorkflowPath('1_click_multiple_angles.json'),
+  'multi-angles-scene': getBundledWorkflowPath('1_click_multiple_scene_angles-v1.0.json'),
+  'image-edit': getBundledWorkflowPath('image_qwen_image_edit_2509.json'),
+  'image-edit-model-product': getBundledWorkflowPath('image_qwen_image_edit_2509_Model_and_Product.json'),
+  'z-image-turbo': getBundledWorkflowPath('image_z_image_turbo.json'),
+  'nano-banana-2': getBundledWorkflowPath('api_google_nano_banana2_image_edit.json'),
+  'grok-text-to-image': getBundledWorkflowPath('api_grok_text_to_image.json'),
+  'seedream-5-lite-image-edit': getBundledWorkflowPath('api_bytedance_seedream_5_0_lite_image_edit.json'),
+  'nano-banana-pro': getBundledWorkflowPath('api_google_nano_banana2_image_edit.json'), // legacy id alias
+  'music-gen': getBundledWorkflowPath('music_generation.json'),
 }
 
 // Optional workflows - user can download to enable (not in Generate until installed)
